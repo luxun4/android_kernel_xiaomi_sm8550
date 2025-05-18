@@ -4,21 +4,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build-Kernel:
-    strategy:
-      fail-fast: false
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Kernel Repo
         uses: actions/checkout@v3
+        with:
+          repository: luxun4/android_kernel_xiaomi_sm8550
+          ref: lineage-21
 
       - name: Install Dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc git curl wget ccache aria2
+        run: sudo apt update && sudo apt install -y aria2 ccache bc bison flex libncurses-dev libssl-dev gcc make git curl wget
 
       - name: Build Kernel
         uses: luxun4/kernel_build_action@main
@@ -28,10 +27,9 @@ jobs:
           kernel-branch: lineage-21
           config: gki_defconfig
           arch: arm64
-
-          aosp-clang: true      # 使用我修复版 action 自动拉 clang-r450784d
-          aosp-gcc: true        # 必须启用，否则报错 127
-          disable-lto: true     # 防止 LTO 报错
+          aosp-clang: true
+          aosp-gcc: true
+          disable-lto: true
           ksu: true
           ksu-version: main
           anykernel3: true
