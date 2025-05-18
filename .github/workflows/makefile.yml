@@ -1,4 +1,5 @@
 name: Build Kernel
+
 on:
   workflow_dispatch:
 
@@ -14,18 +15,27 @@ jobs:
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
+          # 你的内核仓库地址
           kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
-          kernel-dir: kernel
+          # 内核源码目录（如有子目录）
+          kernel-dir: .
+          # 分支名，改成你的实际分支
           kernel-branch: lineage-21
-          config: |
-            gki_defconfig
-            kalama_le_gki.fragment
+          # 配置文件，可换成你设备使用的 defconfig + fragment
+          config: gki_defconfig kalama_le_gki.fragment
           arch: arm64
-          android-version: 14
-          aosp-gcc: true
-          aosp-clang: true
-          aosp-clang-version: r487747c
+
+          # 使用 Proton Clang（推荐）
+          aosp-clang: false
+          other-clang-url: https://github.com/kdrag0n/proton-clang.git
+          other-clang-branch: master
+
+          # KernelSU 支持
           ksu: true
           ksu-version: main
+
+          # 关闭 LTO 可避免部分 Clang 优化报错
           disable-lto: true
+
+          # 使用 AnyKernel3 打包成刷机包
           anykernel3: true
