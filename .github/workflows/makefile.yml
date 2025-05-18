@@ -20,8 +20,17 @@ jobs:
           sudo apt update
           sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc git curl wget ccache
 
+      - name: Clone Proton Clang
+        run: |
+          git clone --depth=1 https://github.com/kdrag0n/proton-clang.git $HOME/toolchains/proton-clang
+
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
+        env:
+          LD: ${{ env.HOME }}/toolchains/proton-clang/bin/ld.lld
+          HOSTLD: ${{ env.HOME }}/toolchains/proton-clang/bin/ld.lld
+          CC: clang
+          HOSTCC: clang
         with:
           kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
           kernel-dir: sm8550
@@ -39,5 +48,4 @@ jobs:
           disable-lto: true
           anykernel3: true
 
-          # 使用 clang 工具链中的 ld.lld，避免系统 ld/glibc 冲突
-          extra-cmd: "LD=~/toolchains/proton-clang/bin/ld.lld HOSTLD=~/toolchains/proton-clang/bin/ld.lld CC=clang HOSTCC=clang"
+          extra-cmd: ""
