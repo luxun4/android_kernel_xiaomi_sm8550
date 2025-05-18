@@ -18,7 +18,7 @@ jobs:
           # 你的内核仓库地址
           kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
           # 内核源码目录（如有子目录）
-          kernel-dir: .
+          kernel-dir: sm8550
           # 分支名，改成你的实际分支
           kernel-branch: lineage-21
           # 配置文件，可换成你设备使用的 defconfig + fragment
