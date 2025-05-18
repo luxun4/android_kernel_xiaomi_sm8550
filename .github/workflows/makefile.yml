@@ -18,10 +18,10 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc git curl wget ccache
+          sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc git curl wget ccache aria2
 
       - name: Build Kernel
-        uses: dabao1955/kernel_build_action@main
+        uses: luxun4/kernel_build_action@main
         with:
           kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
           kernel-dir: sm8550
@@ -29,20 +29,9 @@ jobs:
           config: gki_defconfig
           arch: arm64
 
-          # 开启 AOSP 工具链（注意：必须都为 true）
-          aosp-clang: true
-          aosp-gcc: true
-
-          # 不用 proton-clang
-          other-clang-url: ""
-          other-clang-branch: ""
-
-          # KSU 和其他选项
+          aosp-clang: true      # 使用我修复版 action 自动拉 clang-r450784d
+          aosp-gcc: true        # 必须启用，否则报错 127
+          disable-lto: true     # 防止 LTO 报错
           ksu: true
           ksu-version: main
-
-          disable-lto: true
           anykernel3: true
-
-          # 不设置 extra-cmd
-          extra-cmd: ""
