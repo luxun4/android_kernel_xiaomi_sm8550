@@ -24,7 +24,7 @@ jobs:
         uses: dabao1955/kernel_build_action@main
         with:
           kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
-          kernel-dir: .
+          kernel-dir: sm8550
           kernel-branch: lineage-21
           config: gki_defconfig
           arch: arm64
