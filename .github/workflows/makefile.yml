@@ -9,27 +9,53 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      TOOLCHAIN_DIR: ${{ github.workspace }}/clang
+      KERNEL_DIR: ${{ github.workspace }}/android_kernel_xiaomi_sm8550
+      ARCH: arm64
+      CROSS_COMPILE: aarch64-linux-gnu-
+      DEFCONFIG: gki_defconfig
+
     steps:
-      - name: Checkout Kernel Repo
+      - name: Checkout kernel repo
         uses: actions/checkout@v3
         with:
-          repository: luxun4/android_kernel_xiaomi_sm8550
           ref: lineage-21
 
       - name: Install Dependencies
-        run: sudo apt update && sudo apt install -y aria2 ccache bc bison flex libncurses-dev libssl-dev gcc make git curl wget
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            clang llvm lld \
+            gcc-aarch64-linux-gnu \
+            binutils-aarch64-linux-gnu \
+            bc bison flex libssl-dev libncurses-dev make git curl wget ccache
+
+      - name: Download and setup AOSP Clang
+        run: |
+          mkdir -p $TOOLCHAIN_DIR
+          cd $TOOLCHAIN_DIR
+          if [ ! -d "clang" ]; then
+            wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r450784d.tar.gz -O clang.tar.gz
+            tar -xf clang.tar.gz
+          fi
+          export PATH=$TOOLCHAIN_DIR/clang/bin:$PATH
 
       - name: Build Kernel
-        uses: luxun4/kernel_build_action@main
+        run: |
+          cd $KERNEL_DIR
+          make O=out ARCH=$ARCH $DEFCONFIG
+          make -j$(nproc) O=out ARCH=$ARCH \
+            CC=clang \
+            LD=ld.lld \
+            HOSTCC=gcc \
+            CROSS_COMPILE=$CROSS_COMPILE
+
+      - name: Archive kernel image
+        run: |
+          cd $KERNEL_DIR/out
+          tar czf kernel-build.tar.gz *
+        uses: actions/upload-artifact@v3
         with:
-          kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
-          kernel-dir: sm8550
-          kernel-branch: lineage-21
-          config: gki_defconfig
-          arch: arm64
-          aosp-clang: true
-          aosp-gcc: true
-          disable-lto: true
-          ksu: true
-          ksu-version: main
-          anykernel3: true
+          name: kernel-build
+          path: $KERNEL_DIR/out/kernel-build.tar.gz
