@@ -29,19 +29,20 @@ jobs:
           config: gki_defconfig
           arch: arm64
 
-          # 关键：使用 AOSP clang，避免和 glibc 不兼容
+          # 开启 AOSP 工具链（注意：必须都为 true）
           aosp-clang: true
+          aosp-gcc: true
 
-          # 不使用 proton-clang
+          # 不用 proton-clang
           other-clang-url: ""
           other-clang-branch: ""
 
-          # KSU 和其他选项按你需要
+          # KSU 和其他选项
           ksu: true
           ksu-version: main
 
           disable-lto: true
           anykernel3: true
 
-          # 不需要设置 extra-cmd，避免污染
+          # 不设置 extra-cmd
           extra-cmd: ""
