@@ -18,7 +18,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc
+          sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc git curl wget ccache
 
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
@@ -39,5 +39,5 @@ jobs:
           disable-lto: true
           anykernel3: true
 
-          # 强制使用兼容的 ld.lld 避免 glibc 冲突
-          extra-cmd: "LD=ld.lld HOSTLD=ld.lld"
+          # 使用 clang 工具链中的 ld.lld，避免系统 ld/glibc 冲突
+          extra-cmd: "LD=~/toolchains/proton-clang/bin/ld.lld HOSTLD=~/toolchains/proton-clang/bin/ld.lld CC=clang HOSTCC=clang"
