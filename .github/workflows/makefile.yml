@@ -12,11 +12,19 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y binutils gcc bison flex libssl-dev libncurses-dev bc
+
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
           kernel-url: https://github.com/luxun4/android_kernel_xiaomi_sm8550
-          kernel-dir: sm8550
+          kernel-dir: .
           kernel-branch: lineage-21
           config: gki_defconfig
           arch: arm64
@@ -30,4 +38,6 @@ jobs:
 
           disable-lto: true
           anykernel3: true
-          extra-cmd: "LD=ld.lld"
+
+          # 强制使用兼容的 ld.lld 避免 glibc 冲突
+          extra-cmd: "LD=ld.lld HOSTLD=ld.lld"
